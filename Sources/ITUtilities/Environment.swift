@@ -26,9 +26,11 @@ public struct Environment
         return nil
     }
 
-    public static func overridable<T>(_ defaultValue: T, _ key: String) -> T
+    public static func overridable<T>(_ defaultValue: T, _ key: String, appGroup: String? = nil) -> T
     {
-        guard let envStrValue = Environment.getenv(key) ?? (UserDefaults.standard.value(forKey: key) as? String)
+        let userDefaults: UserDefaults? = (appGroup == nil) ? UserDefaults.standard : UserDefaults(suiteName: appGroup)
+
+        guard let envStrValue = Environment.getenv(key) ?? (userDefaults?.value(forKey: key) as? String)
             else { return defaultValue }
 
         var retVal: T? = nil
@@ -44,9 +46,11 @@ public struct Environment
         }
     }
 
-    public static func overridable<R: RawRepresentable>(_ defaultValue: R, _ key: String) -> R
+    public static func overridable<R: RawRepresentable>(_ defaultValue: R, _ key: String, appGroup: String? = nil) -> R
     {
-        guard let envStrValue = Environment.getenv(key) ?? (UserDefaults.standard.value(forKey: key) as? String)
+        let userDefaults: UserDefaults? = (appGroup == nil) ? UserDefaults.standard : UserDefaults(suiteName: appGroup)
+
+        guard let envStrValue = Environment.getenv(key) ?? (userDefaults?.value(forKey: key) as? String)
             else { return defaultValue }
 
         var rawVal: R.RawValue? = nil
