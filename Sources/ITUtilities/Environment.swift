@@ -26,6 +26,31 @@ public struct Environment
         return nil
     }
 
+    
+    public static func infoPlist<T>(_ defaultValue: T, _ keyPath: DictKeyPath?) -> T
+    {
+        guard let envValue = getInfoPlistEntry(keyPath) else { return defaultValue }
+        
+        if let v = envValue as? T { return v }
+        
+        guard let envStrValue = envValue as? String else {
+            fatalError("Illegal value for type for Info.plist key '\(keyPath ?? "")'")
+        }
+        if envStrValue == "" { return defaultValue }
+        
+        var retVal: T? = nil
+        if      defaultValue is String { retVal = envStrValue as? T}
+        else if defaultValue is Int    { retVal = Int(envStrValue) as? T }
+        else if defaultValue is Double { retVal = Double(envStrValue) as? T }
+        else if defaultValue is Bool   { retVal = Bool(envStrValue) as? T }
+
+        if let r = retVal {
+            return r
+        } else {
+            fatalError("Illegal value for type for Info.plist key '\(keyPath ?? "")'")
+        }
+    }
+    
     public static func overridable<T>(_ defaultValue: T, _ key: String, appGroup: String? = nil) -> T
     {
         let userDefaults: UserDefaults? = (appGroup == nil) ? UserDefaults.standard : UserDefaults(suiteName: appGroup)
